@@ -1,0 +1,61 @@
+﻿@page "/arithmeticpage"
+
+@using Arithmetic
+@using Grpc.Net.Client
+
+<h1>더하기 결과</h1>
+<div>
+    결과: <span>@result</span>
+</div>
+
+<input type="text" @bind="First" />
+<input type="text" @bind="Second" />
+<input type="button" @onclick="@AddAsync" value="더하기" />
+<input type="button" @onclick="@SubtractAsync" value="빼기" />
+
+@code {
+    private int result = 0;
+
+    public int First { get; set; }
+    public int Second { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+        var httpClient = new HttpClient();
+        httpClient.BaseAddress = new Uri("http://localhost:50051");
+
+        var arithmeticClient = GrpcClient.Create<ArithmeticService.ArithmeticServiceClient>(httpClient);
+        var arithmetic = await arithmeticClient.AddAsync(new RequestMessage { First = 3, Second = 5 });
+
+        result = arithmetic.Result;
+    }
+
+    protected async Task AddAsync()
+    {
+        RequestMessage r = new RequestMessage() { First = First, Second = Second };
+    
+        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+        var httpClient = new HttpClient();
+        httpClient.BaseAddress = new Uri("http://localhost:50051");
+
+        var arithmeticClient = GrpcClient.Create<ArithmeticService.ArithmeticServiceClient>(httpClient);
+        var arithmeticAdd = await arithmeticClient.AddAsync(r);
+
+        result = arithmeticAdd.Result;
+    }
+
+    protected async Task SubtractAsync()
+    {
+        RequestMessage r = new RequestMessage() { First = First, Second = Second };
+    
+        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+        var httpClient = new HttpClient();
+        httpClient.BaseAddress = new Uri("http://localhost:50051");
+
+        var arithmeticClient = GrpcClient.Create<ArithmeticService.ArithmeticServiceClient>(httpClient);
+        var arithmeticSubtract = await arithmeticClient.SubtractAsync(r);
+
+        result = arithmeticSubtract.Result;
+    }
+}
