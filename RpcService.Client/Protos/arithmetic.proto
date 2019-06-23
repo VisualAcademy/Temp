@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option csharp_namespace = "Arithmetic";
 
-package DotNetNote;
+package Arithmetic;
 
 // 요청 형식
 message RequestMessage {
